@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>61.0</apiVersion>
+    <isExposed>true</isExposed>
+	<targets>
+		<target>lightning__AppPage</target>
+		<target>lightning__RecordPage</target>
+		<target>lightning__HomePage</target>
+	</targets>
+	<targetConfigs>
+		<targetConfig targets="lightning__AppPage,lightning__RecordPage,lightning__HomePage">
+			<property type="String" name="componentTitle" label="タイトル" description=""></property>
+			<property type="String" name="objApiName" label="オブジェクトのAPI名" required="true" default=""></property>
+			<property type="String" name="keywordSectFieldsApiName" label="キーワード検索する項目のAPI名(複数の場合は,区切り)" required="true" default=""></property>
+			<property type="String" name="checkboxSectFieldsApiName" label="チェックボックス項目のAPI名(複数の場合は,区切り)" required="false" default=""></property>
+			<property type="String" name="rangeSectFieldsApiName" label="範囲検索する項目のAPI名(複数の場合は,区切り)" required="false" default=""></property>
+			<property type="String" name="pickListSectFieldsApiName" label="複数選択リスト項目のAPI名(複数の場合は,区切り)" required="false" default=""></property>
+			<property type="Boolean" name="isPickListSelectDefaultAll" label="複数選択リスト項目デフォルト全選択" required="false" default="false"></property>
+			<property type="String" name="extDispSearchResFieldsColumns" label="検索結果に追加で表示させる項目のAPI名(複数の場合は,区切り)" required="false" default=""></property>
+		</targetConfig>
+	</targetConfigs>
+</LightningComponentBundle>

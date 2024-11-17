@@ -1,0 +1,47 @@
+.fieldLabelUniform{
+	padding-inline: 1%;
+	margin-top: auto;
+	margin-bottom: auto;
+	width: 15%;
+}
+
+.inputFieldSectionUniform{
+	width: 35%;
+}
+
+.inputFieldUniform{
+	width: 75%;
+}
+
+.comboboxFieldUniform{
+	margin-right: 5px;
+	font-size: small;
+}
+
+.checkBoxFieldUniform{
+	margin-top: 10px;
+}
+
+.rangeInputFieldUniform{
+	width: 250%;
+}
+
+.wavyLine{
+	text-align: center;
+	margin-top: 20px;
+	font-size: 20px;
+	margin-inline: 15px;
+}
+
+.pickListFieldUniform{
+	width: 35%;
+}
+
+.button{
+	margin-right: 15px;
+}
+
+.buttonGroupCenter{
+	text-align: center;
+	margin: 30px;
+}

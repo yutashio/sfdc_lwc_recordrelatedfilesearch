@@ -1,0 +1,169 @@
+<template>
+	<lightning-card icon-name="standard:file" title={componentTitle}>
+		<template lwc:if={spinner}>
+			<lightning-spinner alternative-text="spinner" size="medium"></lightning-spinner>
+		</template>
+		<div class="slds-m-around_medium">
+			<div class="slds-grid slds-wrap">
+				<div class="fieldLabelUniform slds-col slds-size_1-of-4">
+					<abbr class="slds-required" title="required">* </abbr>ファイル名
+				</div>
+				<div class="inputFieldSectionUniform slds-col slds-size_1-of-4">
+					<div class="slds-list_horizontal">
+						<div class="comboboxFieldUniform">
+							<lightning-combobox
+									class="matchTypeInputFileName"
+									name="ContentDocument.title"
+									value={matchTypeValue}
+									options={matchTypeOptions}
+									onchange={handleInputFileSearchComboChange}></lightning-combobox>
+						</div>
+						<div class="inputFieldUniform">
+							<lightning-input class="inputFileName" name="ContentDocument.title" onchange={handleInputFileSearchTxtChange}></lightning-input>
+						</div>
+					</div>
+				</div>
+				<div class="fieldLabelUniform slds-col slds-size_1-of-4">
+					ファイル拡張子
+				</div>
+				<div class="inputFieldSectionUniform slds-col slds-size_1-of-4">
+					<div class="slds-list_horizontal">
+						<div class="comboboxFieldUniform">
+							<lightning-combobox
+									class="matchTypeInputFileName"
+									name="ContentDocument.FileExtension"
+									value={matchTypeValue}
+									options={matchTypeOptions}
+									onchange={handleInputFileSearchComboChange}></lightning-combobox>
+						</div>
+						<div class="inputFieldUniform">
+							<lightning-input class="inputFileExtension" name="ContentDocument.FileExtension" onchange={handleInputFileSearchTxtChange}></lightning-input>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-grid slds-wrap">
+				<div class="fieldLabelUniform slds-col slds-size_1-of-4">
+					<div class="rangefieldLabelUniform">
+						作成日
+					</div>
+				</div>
+				<div class="slds-col slds-size_1-of-4">
+					<div class="rangeInputFieldUniform slds-list_horizontal">
+						<lightning-input class="inputFileStartCreatedDate" type="datetime" name="ContentDocument.ContentModifiedDate" onchange={handleInputFileSearchRangeStartChange}></lightning-input>
+						<div class="wavyLine">
+							～
+						</div>
+						<lightning-input class="inputFileEndCreatedDate" type="datetime" name="ContentDocument.ContentModifiedDate" onchange={handleInputFileSearchRangeEndChange}></lightning-input>
+					</div>
+				</div>
+				<div class="slds-col slds-size_1-of-4"></div>
+				<div class="slds-col slds-size_1-of-4"></div>
+			</div>
+
+			<!-- セクション分け -->
+			<hr>
+
+			<!-- キーワード検索 -->
+			<div class="slds-grid slds-wrap">
+				<template for:each={searchResKeywordList} for:item="rl">
+					<div class="fieldLabelUniform slds-col slds-size_1-of-4" key={rl.key}>
+						{rl.fieldLabel}
+					</div>
+					<div class="inputFieldSectionUniform slds-col slds-size_1-of-4" key={rl.key}>
+						<div class="slds-list_horizontal">
+							<div class="comboboxFieldUniform">
+								<lightning-combobox
+									class="matchTypeInputFileName"
+									name={rl.fieldApi}
+									value={matchTypeValue}
+									options={matchTypeOptions}
+									onchange={handleInputSObjSearchComboChange}></lightning-combobox>
+							</div>
+							<div class="inputFieldUniform">
+								<lightning-input class="inputSObjSearchTxt" name={rl.fieldApi} type={rl.fieldType} onchange={handleInputSObjSearchTxtChange}></lightning-input>
+							</div>
+						</div>
+					</div>
+				</template>
+			</div>
+
+			<!-- チェックボックス検索 -->
+			<div class="slds-grid slds-wrap">
+				<template for:each={searchResCheckboxList} for:item="rl">
+					<div class="fieldLabelUniform slds-col slds-size_1-of-4" key={rl.key}>
+						<div class="checkBoxFieldUniform">
+							{rl.fieldLabel}
+						</div>
+					</div>
+					<div class="inputFieldSectionUniform slds-col slds-size_1-of-4" key={rl.key}>
+						<div class="checkBoxFieldUniform">
+							<lightning-radio-group name={rl.fieldApi}
+								options={radioOptions}
+								value={radioValue}
+								type="button"
+								onchange={handleInputSObjCheckboxSearch}></lightning-radio-group>
+						</div>
+					</div>
+				</template>
+			</div>
+
+			<!-- 範囲検索 -->
+			<div class="slds-grid slds-wrap">
+				<template for:each={searchResRangeList} for:item="rl">
+					<div class="fieldLabelUniform slds-col slds-size_1-of-4" key={rl.key}>
+						<div class="rangefieldLabelUniform">
+							{rl.fieldLabel}
+						</div>
+					</div>
+					<div class="slds-col slds-size_1-of-4" key={rl.key}>
+						<div class="rangeInputFieldUniform slds-list_horizontal">
+								<lightning-input class="inputSObjSearchRangeStart" name={rl.fieldApi} type={rl.fieldType} onchange={handleInputSObjSearchRangeStartChange}></lightning-input>
+							<div class="wavyLine">
+								～
+							</div>
+								<lightning-input class="inputSObjSearchRangeEnd" name={rl.fieldApi} type={rl.fieldType} onchange={handleInputSObjSearchRangeEndChange}></lightning-input>
+						</div>
+					</div>
+					<div class="slds-col slds-size_1-of-4" key={rl.key}></div>
+					<div class="slds-col slds-size_1-of-4" key={rl.key}></div>
+				</template>
+			</div>
+
+			<!-- 複数選択リスト -->
+			<div class="slds-grid slds-wrap">
+				<template for:each={searchResPickListList} for:item="rl">
+					<div class="fieldLabelUniform slds-col slds-size_1-of-4" key={rl.key}>
+						{rl.fieldLabel}
+					</div>
+					<div class="pickListFieldUniform slds-col slds-size_1-of-4" key={rl.key}>
+						<lightning-dual-listbox name={rl.fieldApi}
+									source-label="選択可能"
+									selected-label="選択済み"
+									options={rl.pickList}
+									value={rl.defaultPickList}
+									onchange={handleInputSObjSearchPickListChange}></lightning-dual-listbox>
+					</div>
+				</template>
+			</div>
+
+			<!-- ボタン -->
+			<div class="buttonGroupCenter">
+				<lightning-button class="button" icon-name="utility:search" label="Search" onclick={searchButton}></lightning-button>
+				<lightning-button class="button" icon-name="utility:clear" label="Clear" onclick={clearButton}></lightning-button>
+			</div>
+		</div>
+	</lightning-card>
+	<lightning-card title="検索結果">
+		<template lwc:if={spinner}>
+			<lightning-spinner alternative-text="spinner" size="medium"></lightning-spinner>
+		</template>
+		<div style="margin-left: 14px; font-size: 12px;">| ヒット件数: {numOfSearchRes}件 |</div>
+		<lightning-datatable
+			hide-checkbox-column="true"
+			key-field="id"
+			data={data}
+			columns={columns}>
+		</lightning-datatable>
+	</lightning-card>
+</template>
