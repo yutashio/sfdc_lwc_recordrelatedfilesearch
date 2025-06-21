@@ -162,20 +162,22 @@ export default class RecordRelatedFileSearch extends LightningElement {
 			inputFileName.setCustomValidity('');
 			inputFileName.reportValidity();
 			this.spinner = true;
-			search({limitNumOfDisp: this.limitNumOfDisp,
-					objApiName: this.objApiName,
-					keywordSectFieldsApiName: this.keywordSectFieldsApiName,
-					rangeSectFieldsApiName: this.rangeSectFieldsApiName,
-					extDispSearchResFieldsColumns: this.extDispSearchResFieldsColumns,
-					inputFileSearchTxtVals: JSON.stringify(Object.fromEntries(this.inputFileSearchTxtVals)),
-					inputFileSearchRangeStartVals: JSON.stringify(Object.fromEntries(this.inputFileSearchRangeStartVals)),
-					inputFileSearchRangeEndVals: JSON.stringify(Object.fromEntries(this.inputFileSearchRangeEndVals)),
-					inputSObjSearchTxtVals: JSON.stringify(Object.fromEntries(this.inputSObjSearchTxtVals)),
-					inputSObjSearchCheckboxVals: JSON.stringify(Object.fromEntries(this.inputSObjSearchCheckboxVals)),
-					inputSObjSearchRangeStartVals: JSON.stringify(Object.fromEntries(this.inputSObjSearchRangeStartVals)),
-					inputSObjSearchRangeEndVals: JSON.stringify(Object.fromEntries(this.inputSObjSearchRangeEndVals)),
-					inputSObjSearchPickListVals: JSON.stringify(Object.fromEntries(this.inputSObjSearchPickListVals))
-			})
+			const searchCriteria = {
+				limitNumOfDisp: this.limitNumOfDisp,
+				objApiName: this.objApiName,
+				keywordSectFieldsApiName: this.keywordSectFieldsApiName,
+				rangeSectFieldsApiName: this.rangeSectFieldsApiName,
+				extDispSearchResFieldsColumns: this.extDispSearchResFieldsColumns,
+				inputFileSearchTxtVals: Object.fromEntries(this.inputFileSearchTxtVals),
+				inputFileSearchRangeStartVals: Object.fromEntries(this.inputFileSearchRangeStartVals),
+				inputFileSearchRangeEndVals: Object.fromEntries(this.inputFileSearchRangeEndVals),
+				inputSObjSearchTxtVals: Object.fromEntries(this.inputSObjSearchTxtVals),
+				inputSObjSearchCheckboxVals: Object.fromEntries(this.inputSObjSearchCheckboxVals),
+				inputSObjSearchRangeStartVals: Object.fromEntries(this.inputSObjSearchRangeStartVals),
+				inputSObjSearchRangeEndVals: Object.fromEntries(this.inputSObjSearchRangeEndVals),
+				inputSObjSearchPickListVals: Object.fromEntries(this.inputSObjSearchPickListVals)
+			};
+			search({ searchCriteriaJson: JSON.stringify(searchCriteria) })
 			.then(result => {
 				if(Object.keys(result).length == 0){
 					this.data = result.slice(0, this.limitNumOfDisp);
