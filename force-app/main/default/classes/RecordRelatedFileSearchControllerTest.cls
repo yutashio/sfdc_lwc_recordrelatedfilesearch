@@ -106,6 +106,24 @@ private class RecordRelatedFileSearchControllerTest {
 	}
 
 	@isTest
+	static void testInitPickListSearchSection() {
+		// テストデータ作成
+		String objApiName = 'Account';
+		String pickListSectFieldsApiName = ''; // 複数選択リスト項目がある場合は指定する
+
+		Test.startTest();
+		List<Object> result = RecordRelatedFileSearchController.initPickListSearchSection(
+			objApiName,
+			pickListSectFieldsApiName,
+			false
+		);
+		Test.stopTest();
+
+		System.assertNotEquals(null, result, '戻り値が null ではないこと');
+		System.assertEquals(0, result.size(), '結果が空であること');
+	}
+
+	@isTest
 	static void testSetSpecifyRangeSoqlWhere_StartEndValueAvailable() {
 		// テストデータ作成
 		String objApiName = 'Opportunity';
@@ -172,7 +190,7 @@ private class RecordRelatedFileSearchControllerTest {
 	static void testSetSpecifyRangeSoqlWhere_StartEndTimeValueAvailable() {
 		// テストデータ作成
 		String objApiName = 'Opportunity';
-		Set<String> inputSearchRangeValsSet = new Set<String>{'CloseDate'}; //標準項目に時間項目が存在しないため判定分突破のため日付項目を使用
+		Set<String> inputSearchRangeValsSet = new Set<String>{'CloseDate'}; //Time型の標準項目が存在しないため、ロジック分岐を通過させる目的で CloseDate（日付項目）に時間値を渡してテスト
 		Map<String, String> inputSearchRangeStartValsMap = new Map<String, String>{
 			'CloseDate' => '12:00:00'
 		};
@@ -190,15 +208,15 @@ private class RecordRelatedFileSearchControllerTest {
 
 		// 検証
 		System.assertNotEquals(null, soql, 'SOQL が null ではないこと');
-		System.assert(soql.contains('CloseDate >= 12:00:00'), 'MyTimeField の開始条件が正しいこと');
-		System.assert(soql.contains('CloseDate <= 15:00:00'), 'MyTimeField の終了条件が正しいこと');
+		System.assert(soql.contains('CloseDate >= 12:00:00'), 'CloseDate  の開始条件が正しいこと');
+		System.assert(soql.contains('CloseDate <= 15:00:00'), 'CloseDate  の終了条件が正しいこと');
 	}
 
 	@isTest
 	static void testSetSpecifyRangeSoqlWhere_OnlyStartTimeValueAvailable() {
 		// テストデータ作成
 		String objApiName = 'Opportunity';
-		Set<String> inputSearchRangeValsSet = new Set<String>{'CloseDate'}; //標準項目に時間項目が存在しないため判定分突破のため日付項目を使用
+		Set<String> inputSearchRangeValsSet = new Set<String>{'CloseDate'}; //Time型の標準項目が存在しないため、ロジック分岐を通過させる目的で CloseDate（日付項目）に時間値を渡してテスト
 		Map<String, String> inputSearchRangeStartValsMap = new Map<String, String>{
 			'CloseDate' => '12:00:00'
 		};
@@ -214,14 +232,14 @@ private class RecordRelatedFileSearchControllerTest {
 
 		// 検証
 		System.assertNotEquals(null, soql, 'SOQL が null ではないこと');
-		System.assert(soql.contains('CloseDate >= 12:00:00'), 'MyTimeField の開始条件が正しいこと');
+		System.assert(soql.contains('CloseDate >= 12:00:00'), 'CloseDate の開始条件が正しいこと');
 	}
 
 	@isTest
 	static void testSetSpecifyRangeSoqlWhere_OnlyEndTimeValueAvailable() {
 		// テストデータ作成
 		String objApiName = 'Opportunity';
-		Set<String> inputSearchRangeValsSet = new Set<String>{'CloseDate'}; //標準項目に時間項目が存在しないため判定分突破のため日付項目を使用
+		Set<String> inputSearchRangeValsSet = new Set<String>{'CloseDate'}; //Time型の標準項目が存在しないため、ロジック分岐を通過させる目的で CloseDate（日付項目）に時間値を渡してテスト
 		Map<String, String> inputSearchRangeStartValsMap = new Map<String, String>{};
 		Map<String, String> inputSearchRangeEndValsMap = new Map<String, String>{
 			'CloseDate' => '15:00:00'
@@ -237,7 +255,7 @@ private class RecordRelatedFileSearchControllerTest {
 
 		// 検証
 		System.assertNotEquals(null, soql, 'SOQL が null ではないこと');
-		System.assert(soql.contains('CloseDate <= 15:00:00'), 'MyTimeField の終了条件が正しいこと');
+		System.assert(soql.contains('CloseDate <= 15:00:00'), 'CloseDate の終了条件が正しいこと');
 	}
 
 	@isTest
@@ -306,37 +324,34 @@ private class RecordRelatedFileSearchControllerTest {
 		);
 		insert cdl;
 
+		// CloseDate の検索範囲
+		String closeStart = System.now().addDays(15).format('yyyy-MM-dd');
+		String closeEnd   = System.now().addDays(45).format('yyyy-MM-dd');
+
+		// ContentVersion の作成日時
+		String createdStart = System.now().addDays(-1).format('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+		String createdEnd   = System.now().addDays(1).format('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+
 		// 検索条件の設定
-		String objApiName = 'Opportunity';
-		String keywordSectFieldsApiName = 'Name,StageName';
-		String rangeSectFieldsApiName = 'CloseDate';
-		String extDispSearchResFieldsColumns = 'Name,StageName';
-		String inputFileSearchTxtVals = '{"ContentDocument.Title":{"value":"Test","matchType":"containsString"}}';
-		String inputFileSearchRangeStartVals = '{"ContentDocument.ContentModifiedDate":"2022-01-01T00:00:00.000Z"}';
-		String inputFileSearchRangeEndVals = '{"ContentDocument.ContentModifiedDate":"2024-12-31T23:59:59.999Z"}';
-		String inputSObjSearchTxtVals = '{"Name":{"value":"Test Opportunity","matchType":"containsString"}}';
-		String inputSObjSearchCheckboxVals = '{"IsPrivate":"true"}'; // チェックボックス条件
-		String inputSObjSearchRangeStartVals = '{"CloseDate":"2022-01-01"}';
-		String inputSObjSearchRangeEndVals = '{"CloseDate":"2024-12-31"}';
-		String inputSObjSearchPickListVals = '{}'; // 複数選択リスト項目は空
+		String searchCriteriaJson = '{'
+		+ '"limitNumOfDisp":500,'
+		+ '"objApiName":"Opportunity",'
+		+ '"keywordSectFieldsApiName":"Name,StageName",'
+		+ '"rangeSectFieldsApiName":"CloseDate",'
+		+ '"extDispSearchResFieldsColumns":"Name,StageName",'
+		+ '"inputFileSearchTxtVals":{"ContentDocument.Title":{"value":"Test","matchType":"containsString"}},'
+		+ '"inputFileSearchRangeStartVals":{"ContentDocument.ContentModifiedDate":"'+ createdStart + '"},'
+		+ '"inputFileSearchRangeEndVals":{"ContentDocument.ContentModifiedDate":"' + createdEnd + '"},'
+		+ '"inputSObjSearchTxtVals":{"Name":{"value":"Test Opportunity","matchType":"containsString"}},'
+		+ '"inputSObjSearchCheckboxVals":{"IsPrivate":"true"},'
+		+ '"inputSObjSearchRangeStartVals":{"CloseDate":"' + closeStart +'"},'
+		+ '"inputSObjSearchRangeEndVals":{"CloseDate":"' + closeEnd + '"},'
+		+ '"inputSObjSearchPickListVals":{}'
+		+ '}';
 
 		// 実行
 		Test.startTest();
-		List<Map<String, String>> result = RecordRelatedFileSearchController.search(
-			10,
-			objApiName,
-			keywordSectFieldsApiName,
-			rangeSectFieldsApiName,
-			extDispSearchResFieldsColumns,
-			inputFileSearchTxtVals,
-			inputFileSearchRangeStartVals,
-			inputFileSearchRangeEndVals,
-			inputSObjSearchTxtVals,
-			inputSObjSearchCheckboxVals,
-			inputSObjSearchRangeStartVals,
-			inputSObjSearchRangeEndVals,
-			inputSObjSearchPickListVals
-		);
+		List<Map<String, String>> result = RecordRelatedFileSearchController.search(searchCriteriaJson);
 		Test.stopTest();
 
 		// 検証
@@ -345,6 +360,75 @@ private class RecordRelatedFileSearchControllerTest {
 		System.assertEquals('Test File', result[0].get('fileName'), 'ファイル名が正しいこと');
 		System.assertEquals('Test Opportunity', result[0].get('recordName'), 'レコード名が正しいこと');
 		System.assertEquals('Prospecting', result[0].get('StageName'), 'ステージ名が正しいこと');
+	}
+
+	@isTest
+	static void testSearchLimitPlusOne() {
+		//データの作成
+		List<Account> accountList = new List<Account>();
+		for (Integer i = 0; i < 150; i++) {
+			accountList.add(new Account(Name = 'Test Account ' + i));
+		}
+		insert accountList;
+
+		//ContentVersionの作成
+		List<ContentVersion> contentVersionList = new List<ContentVersion>();
+		for (Account acc : accountList) {
+			contentVersionList.add(new ContentVersion(
+				Title = 'Test File ' + acc.Name,
+				PathOnClient = 'TestFile_' + acc.Name + '.txt',
+				VersionData = Blob.valueOf('This is a test file for ' + acc.Name)
+			));
+		}
+		insert contentVersionList;
+
+		//ContentDocumentLinkの作成
+		Map<Id, Id> accountToDocumentMap = new Map<Id, Id>();
+		List<ContentVersion> insertedContentVersions = [
+			SELECT Id, ContentDocumentId, Title
+			FROM ContentVersion
+			WHERE Title LIKE 'Test File%'
+		];
+		for (Integer i = 0; i < accountList.size(); i++) {
+			accountToDocumentMap.put(accountList[i].Id, insertedContentVersions[i].ContentDocumentId);
+		}
+		List<ContentDocumentLink> contentDocumentLinks = new List<ContentDocumentLink>();
+		for (Account acc : accountList) {
+			contentDocumentLinks.add(new ContentDocumentLink(
+				LinkedEntityId = acc.Id,
+				ContentDocumentId = accountToDocumentMap.get(acc.Id),
+				ShareType = 'V' // Visibility (View) 権限
+			));
+		}
+		insert contentDocumentLinks;
+
+		//検索条件の設定(検索結果を最大100件に制限)
+		String searchCriteriaJson = '{'
+		+ '"limitNumOfDisp":100,'
+		+ '"objApiName":"Account",'
+		+ '"keywordSectFieldsApiName":"Name",'
+		+ '"rangeSectFieldsApiName":"CreatedDate",'
+		+ '"extDispSearchResFieldsColumns":"Name",'
+		+ '"inputFileSearchTxtVals":{"ContentDocument.Title":{"value":"Test File","matchType":"containsString"}},'
+		+ '"inputFileSearchRangeStartVals":{},'
+		+ '"inputFileSearchRangeEndVals":{},'
+		+ '"inputSObjSearchTxtVals":{"Name":{"value":"Test Account","matchType":"containsString"}},'
+		+ '"inputSObjSearchCheckboxVals":{},'
+		+ '"inputSObjSearchRangeStartVals":{},'
+		+ '"inputSObjSearchRangeEndVals":{},'
+		+ '"inputSObjSearchPickListVals":{}'
+		+ '}';
+
+		//検索
+		Test.startTest();
+		List<Map<String, String>> result = RecordRelatedFileSearchController.search(searchCriteriaJson);
+		Test.stopTest();
+
+		//検証
+		System.assertNotEquals(null, result, '結果が null ではないこと');
+		System.assertEquals(101, result.size(), '結果が101件返ってくること(limit + 1件)');
+		System.assert(result[0].containsKey('fileName'), '検索結果にファイル名が含まれていること');
+		System.assert(result[0].containsKey('recordName'), '検索結果にレコード名が含まれていること');
 	}
 
 	@isTest
