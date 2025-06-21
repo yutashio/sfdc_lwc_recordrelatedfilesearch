@@ -204,40 +204,29 @@ public with sharing class RecordRelatedFileSearchController {
 	}
 
 	@AuraEnabled
-	public static List<Map<String, String>> search(Integer limitNumOfDisp,
-													String objApiName,
-													String keywordSectFieldsApiName,
-													String rangeSectFieldsApiName,
-													String extDispSearchResFieldsColumns,
-													String inputFileSearchTxtVals,
-													String inputFileSearchRangeStartVals,
-													String inputFileSearchRangeEndVals,
-													String inputSObjSearchTxtVals,
-													String inputSObjSearchCheckboxVals,
-													String inputSObjSearchRangeStartVals,
-													String inputSObjSearchRangeEndVals,
-													String inputSObjSearchPickListVals
-													) {
+	public static List<Map<String, String>> search(String searchCriteriaJson) {
+		// JSON文字列をオブジェクトに変換
+		SearchCriteriaWrapper searchCriteria = (SearchCriteriaWrapper) JSON.deserialize(searchCriteriaJson, SearchCriteriaWrapper.class);
 
 		//添付ファイルセクションのキーワード検索の入力値
-		Map<String, TxtValue> inputFileSearchTxtValsMap = (Map<String, TxtValue>) JSON.deserialize(inputFileSearchTxtVals, Map<String, TxtValue>.class);
+		Map<String, TxtValue> inputFileSearchTxtValsMap = searchCriteria.inputFileSearchTxtVals;
 		//添付ファイルセクションの範囲検索の開始入力値
-		Map<String, String> inputFileSearchRangeStartValsMap = (Map<String, String>)JSON.deserialize(inputFileSearchRangeStartVals, Map<String, String>.class);
+		Map<String, String> inputFileSearchRangeStartValsMap = searchCriteria.inputFileSearchRangeStartVals;
 		//添付ファイルセクションの範囲検索の終了入力値
-		Map<String, String> inputFileSearchRangeEndValsMap = (Map<String, String>)JSON.deserialize(inputFileSearchRangeEndVals, Map<String, String>.class);
+		Map<String, String> inputFileSearchRangeEndValsMap = searchCriteria.inputFileSearchRangeEndVals;
 		//SObjectセクションのキーワード検索の入力値
-		Map<String, TxtValue> inputSObjSearchTxtValsMap = (Map<String, TxtValue>)JSON.deserialize(inputSObjSearchTxtVals, Map<String, TxtValue>.class);
+		Map<String, TxtValue> inputSObjSearchTxtValsMap = searchCriteria.inputSObjSearchTxtVals;
 		//SObjectセクションのチェックボックス検索の入力値
-		Map<String, String> inputSObjSearchCheckboxValsMap = (Map<String, String>) JSON.deserialize(inputSObjSearchCheckboxVals, Map<String, String>.class);
+		Map<String, String> inputSObjSearchCheckboxValsMap = searchCriteria.inputSObjSearchCheckboxVals;
 		//SObjectセクションの範囲検索の開始入力値
-		Map<String, String> inputSObjSearchRangeStartValsMap = (Map<String, String>)JSON.deserialize(inputSObjSearchRangeStartVals, Map<String, String>.class);
+		Map<String, String> inputSObjSearchRangeStartValsMap = searchCriteria.inputSObjSearchRangeStartVals;
 		//SObjectセクションの範囲検索の終了入力値
-		Map<String, String> inputSObjSearchRangeEndValsMap = (Map<String, String>)JSON.deserialize(inputSObjSearchRangeEndVals, Map<String, String>.class);
+		Map<String, String> inputSObjSearchRangeEndValsMap = searchCriteria.inputSObjSearchRangeEndVals;
 		//SObjectセクションの複数選択リスト検索の入力値
-		Map<String, String> inputSObjSearchPickListValsMap = (Map<String, String>)JSON.deserialize(inputSObjSearchPickListVals, Map<String, String>.class);
+		Map<String, String> inputSObjSearchPickListValsMap = searchCriteria.inputSObjSearchPickListVals;
 
 		//最大検索件数を設定
-		Integer soqlLimitSize = limitNumOfDisp + 1;
+		Integer soqlLimitSize = searchCriteria.limitNumOfDisp + 1;
 
 		//添付ファイルのSOQL作成
 		List<ContentDocumentLink> resultContentVersionList = new List<ContentDocumentLink>();
@@ -261,27 +250,27 @@ public with sharing class RecordRelatedFileSearchController {
 		contVerSoql += 'SELECT';
 		contVerSoql += ' Id';
 		contVerSoql += ' FROM';
-		contVerSoql += ' ' + objApiName;
+		contVerSoql += ' ' + searchCriteria.objApiName;
 		contVerSoql +=' WHERE';
 		contVerSoql +=' Id != null';
 
 		if(!inputSObjSearchTxtValsMap.isEmpty()){
-			contVerSoql += setTxtSoqlWhere(objApiName, inputSObjSearchTxtValsMap);
+			contVerSoql += setTxtSoqlWhere(searchCriteria.objApiName, inputSObjSearchTxtValsMap);
 		}
 
 		if(!inputSObjSearchCheckboxValsMap.isEmpty()){
-			contVerSoql += setCheckboxSoqlWhere(objApiName, inputSObjSearchCheckboxValsMap);
+			contVerSoql += setCheckboxSoqlWhere(searchCriteria.objApiName, inputSObjSearchCheckboxValsMap);
 		}
 
 		Set<String> inputSObjSearchRangeValsSet = new Set<String>();
 		inputSObjSearchRangeValsSet.addAll(inputSObjSearchRangeStartValsMap.keySet());
 		inputSObjSearchRangeValsSet.addAll(inputSObjSearchRangeEndValsMap.keySet());
 		if(!inputSObjSearchRangeValsSet.isEmpty()){
-			contVerSoql += setSpecifyRangeSoqlWhere(objApiName, inputSObjSearchRangeValsSet, inputSObjSearchRangeStartValsMap, inputSObjSearchRangeEndValsMap);
+			contVerSoql += setSpecifyRangeSoqlWhere(searchCriteria.objApiName, inputSObjSearchRangeValsSet, inputSObjSearchRangeStartValsMap, inputSObjSearchRangeEndValsMap);
 		}
 
 		if(!inputSObjSearchPickListValsMap.isEmpty()){
-			contVerSoql += setPickListSoqlWhere(objApiName, inputSObjSearchPickListValsMap);
+			contVerSoql += setPickListSoqlWhere(searchCriteria.objApiName, inputSObjSearchPickListValsMap);
 		}
 
 		contVerSoql += ' )';
@@ -305,7 +294,7 @@ public with sharing class RecordRelatedFileSearchController {
 
 		//付随するSObjectの検索結果を抽出する。
 		Map<String ,Map<String, String>> contMatchedSobjMap = new Map<String ,Map<String, String>>();
-		if(extDispSearchResFieldsColumns != null){
+		if(searchCriteria.extDispSearchResFieldsColumns != null){
 			Set<Id> resultLinkedEntityIdSet = new Set<Id>();
 			for(ContentDocumentLink resContVer : resultContentVersionList){
 				resultLinkedEntityIdSet.add(resContVer.LinkedEntityId);
@@ -314,20 +303,20 @@ public with sharing class RecordRelatedFileSearchController {
 			String sObjectSoql = '';
 			sObjectSoql += 'SELECT';
 			sObjectSoql += ' Id';
-			sObjectSoql += ','+extDispSearchResFieldsColumns;
+			sObjectSoql += ','+searchCriteria.extDispSearchResFieldsColumns;
 			sObjectSoql += ' FROM';
-			sObjectSoql += ' ' + objApiName;
+			sObjectSoql += ' ' + searchCriteria.objApiName;
 			sObjectSoql += ' WHERE';
 			sObjectSoql += ' Id IN :resultLinkedEntityIdSet';
 			//付随するSObject検索
 			List<SObject> resultSObjectList = database.query(sObjectSoql);
 			for (SObject resSObj : resultSObjectList) {
 				Map<String, String> extDispFieldsMap = new Map<String, String>();
-				for (String extDispField : extDispSearchResFieldsColumns.split(',')) {
-					if(getDataType(objApiName, extDispField) == 'DATETIME' && resSObj.get(extDispField) != null){
+				for (String extDispField : searchCriteria.extDispSearchResFieldsColumns.split(',')) {
+					if(getDataType(searchCriteria.objApiName, extDispField) == 'DATETIME' && resSObj.get(extDispField) != null){
 						//DATETIME型データの成型
 						extDispFieldsMap.put(extDispField, String.valueOf(Datetime.valueOf(resSObj.get(extDispField)).format()));
-					}else if(getDataType(objApiName, extDispField) == 'TIME' && resSObj.get(extDispField) != null){
+					}else if(getDataType(searchCriteria.objApiName, extDispField) == 'TIME' && resSObj.get(extDispField) != null){
 						//TIME型データの成型
 						extDispFieldsMap.put(extDispField, String.valueOf(resSObj.get(extDispField)).remove('.000Z'));
 					}else {
@@ -341,7 +330,7 @@ public with sharing class RecordRelatedFileSearchController {
 		List<Map<String, String>> searchCriteriaItemValList = new List<Map<String, String>>();
 		for(ContentDocumentLink resultContVer : resultContentVersionList){
 			Map<String, String> searchResultMap = new Map<String, String>();
-			if(extDispSearchResFieldsColumns != null){
+			if(searchCriteria.extDispSearchResFieldsColumns != null){
 				searchResultMap.putAll(contMatchedSobjMap.get(resultContVer.LinkedEntityId));
 			}
 			searchResultMap.put('fileName', resultContVer.ContentDocument.title);
@@ -567,5 +556,22 @@ public with sharing class RecordRelatedFileSearchController {
 	public class TxtValue {
 		public String value;
 		public String matchType;
+	}
+
+	public class SearchCriteriaWrapper {
+		public Integer limitNumOfDisp;
+		public String objApiName;
+		public String keywordSectFieldsApiName;
+		public String rangeSectFieldsApiName;
+		public String extDispSearchResFieldsColumns;
+
+		public Map<String, TxtValue> inputFileSearchTxtVals;
+		public Map<String, String> inputFileSearchRangeStartVals;
+		public Map<String, String> inputFileSearchRangeEndVals;
+		public Map<String, TxtValue> inputSObjSearchTxtVals;
+		public Map<String, String> inputSObjSearchCheckboxVals;
+		public Map<String, String> inputSObjSearchRangeStartVals;
+		public Map<String, String> inputSObjSearchRangeEndVals;
+		public Map<String, String> inputSObjSearchPickListVals;
 	}
 }
