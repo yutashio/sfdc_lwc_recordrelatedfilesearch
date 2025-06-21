@@ -366,7 +366,7 @@ private class RecordRelatedFileSearchControllerTest {
 	static void testSearchLimitPlusOne() {
 		//データの作成
 		List<Account> accountList = new List<Account>();
-		for (Integer i = 0; i < 150; i++) {
+		for (Integer i = 0; i < 15; i++) {
 			accountList.add(new Account(Name = 'Test Account ' + i));
 		}
 		insert accountList;
@@ -404,7 +404,7 @@ private class RecordRelatedFileSearchControllerTest {
 
 		//検索条件の設定(検索結果を最大100件に制限)
 		String searchCriteriaJson = '{'
-		+ '"limitNumOfDisp":100,'
+		+ '"limitNumOfDisp":10,'
 		+ '"objApiName":"Account",'
 		+ '"keywordSectFieldsApiName":"Name",'
 		+ '"rangeSectFieldsApiName":"CreatedDate",'
@@ -426,7 +426,7 @@ private class RecordRelatedFileSearchControllerTest {
 
 		//検証
 		System.assertNotEquals(null, result, '結果が null ではないこと');
-		System.assertEquals(101, result.size(), '結果が101件返ってくること(limit + 1件)');
+		System.assertEquals(11, result.size(), '結果が11件返ってくること(limit + 1件)');
 		System.assert(result[0].containsKey('fileName'), '検索結果にファイル名が含まれていること');
 		System.assert(result[0].containsKey('recordName'), '検索結果にレコード名が含まれていること');
 	}
