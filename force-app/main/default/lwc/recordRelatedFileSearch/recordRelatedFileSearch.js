@@ -1,4 +1,5 @@
 import { LightningElement, track, api } from 'lwc';
+import { NavigationMixin } from "lightning/navigation";
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import LightningAlert from "lightning/alert";
 import search from '@salesforce/apex/RecordRelatedFileSearchController.search';
@@ -8,7 +9,7 @@ import initRangeSearchSection from '@salesforce/apex/RecordRelatedFileSearchCont
 import initPickListSearchSection from '@salesforce/apex/RecordRelatedFileSearchController.initPickListSearchSection';
 import initExtDispSearchResFieldsColumns from '@salesforce/apex/RecordRelatedFileSearchController.initExtDispSearchResFieldsColumns';
 
-export default class RecordRelatedFileSearch extends LightningElement {
+export default class RecordRelatedFileSearch extends NavigationMixin(LightningElement) {
 
 	limitNumOfDisp = 500; // 検索結果の最大表示件数
 	@api componentTitle; //コンポーネントのタイトル
@@ -130,17 +131,39 @@ export default class RecordRelatedFileSearch extends LightningElement {
 											extDispSearchResFieldsColumns: this.extDispSearchResFieldsColumns,
 		})
 		.then(result => {
-			this.columns = result.map(item => ({
-				label: item.label,
-				fieldName: item.fieldName,
-				type: item.type,
-				typeAttributes: {
-					label: {
+			this.columns = result.map(item => {
+				const col = {
+					label: item.label,
+					fieldName: item.fieldName,
+					type: item.type
+				};
+
+				// typeごとにtypeAttributesを設定
+				const typeAttributes = {};
+
+				// URL
+				if (item.type === 'url') {
+					typeAttributes.label = {
 						fieldName: item.typeAttributes_label_fieldName
-					},
-					target: item.typeAttributes_target
-				},
-			}));
+					};
+					typeAttributes.target = item.typeAttributes_target;
+				}
+
+				// ボタン
+				if (item.type === 'button-icon') {
+					typeAttributes.iconName = item.iconName;
+					typeAttributes.name = item.typeAttributes_Name;
+					typeAttributes.variant = 'bare'; //ボタンのデザイン
+					typeAttributes.title = { fieldName: item.typeAttributes_title_fieldName }; //マウスオーバー時に表示される文字
+				}
+
+				// 何か1つでも設定されていたら
+				if (Object.keys(typeAttributes).length > 0) {
+					col.typeAttributes = typeAttributes;
+				}
+
+				return col;
+			});
 			this.spinner = false;
 		})
 		.catch(error => {
@@ -207,7 +230,7 @@ export default class RecordRelatedFileSearch extends LightningElement {
 					this.dispatchEvent(
 						new ShowToastEvent({
 							title: this.numOfSearchRes+'件ヒットしました。',
-							message: '「ファイル作成及び更新日」の降順で表示しています。',
+							message: '「ファイル作成/更新日」の降順で表示しています。',
 							variant: 'success',
 							mode: 'dismissible'
 						})
@@ -360,6 +383,26 @@ export default class RecordRelatedFileSearch extends LightningElement {
 				element.value = null;
 			});
 			this.inputSObjSearchPickListVals.clear();
+		}
+	}
+
+		handleRowAction(event) {
+		const actionName = event.detail.action.name; // columns の typeAttributes.name
+		const row = event.detail.row; // 行データ
+
+		if (actionName === 'filePreview') {
+			const fileId = row.fileId;
+			if (!fileId) return;
+
+			this[NavigationMixin.Navigate]({
+			type: 'standard__namedPage',
+			attributes: {
+				pageName: 'filePreview'
+			},
+			state: {
+				selectedRecordId: fileId
+			}
+			});
 		}
 	}
 }

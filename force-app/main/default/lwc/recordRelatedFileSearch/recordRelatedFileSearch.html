@@ -163,7 +163,9 @@
 			hide-checkbox-column="true"
 			key-field="id"
 			data={data}
-			columns={columns}>
+			columns={columns}
+			onrowaction={handleRowAction}
+			column-widths-mode="auto">
 		</lightning-datatable>
 	</lightning-card>
 </template>
