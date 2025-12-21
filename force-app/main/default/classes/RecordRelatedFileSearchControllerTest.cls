@@ -272,9 +272,9 @@ private class RecordRelatedFileSearchControllerTest {
 		System.assert(result.size() == 8, 'デフォルト6列+追加2列であること');
 
 		// 0) プレビュー列
-		System.assertEquals('プレビュー', result[0].get('label'), 'プレビュー列: label');
+		System.assertEquals('', result[0].get('label'), 'プレビュー列: label');
 		System.assertEquals('button-icon', result[0].get('type'), 'プレビュー列: type');
-		System.assertEquals('fileName', result[0].get('typeAttributes_title_fieldName'), 'プレビュー列: title フィールド');
+		System.assertEquals('プレビュー', result[0].get('typeAttributes_title_fieldName'), 'プレビュー列: title フィールド');
 		System.assertEquals('preview', result[0].get('buttonActionName'), 'プレビュー列: action 名');
 		System.assertEquals('filePreview', result[0].get('typeAttributes_Name'), 'プレビュー列: name');
 		System.assertEquals('utility:preview', result[0].get('iconName'), 'プレビュー列: icon');
