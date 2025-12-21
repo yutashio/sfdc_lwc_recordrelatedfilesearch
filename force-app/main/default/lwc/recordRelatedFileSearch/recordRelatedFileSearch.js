@@ -151,10 +151,11 @@ export default class RecordRelatedFileSearch extends NavigationMixin(LightningEl
 
 				// ボタン
 				if (item.type === 'button-icon') {
+					col.initialWidth= 50;
 					typeAttributes.iconName = item.iconName;
 					typeAttributes.name = item.typeAttributes_Name;
 					typeAttributes.variant = 'bare'; //ボタンのデザイン
-					typeAttributes.title = { fieldName: item.typeAttributes_title_fieldName }; //マウスオーバー時に表示される文字
+					typeAttributes.title = item.typeAttributes_title_fieldName; //マウスオーバー時に表示される文字
 				}
 
 				// 何か1つでも設定されていたら

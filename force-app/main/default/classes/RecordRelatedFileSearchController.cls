@@ -137,9 +137,9 @@ public with sharing class RecordRelatedFileSearchController {
 		List<Map<String, String>> extDispSearchResFieldsColumnsList = new List<Map<String, String>>();
 
 		Map<String, String> previewColumnMap = new Map<String, String>{
-			'label' => 'プレビュー',
+			'label' => '',
 			'type' => 'button-icon',
-			'typeAttributes_title_fieldName' => 'fileName',
+			'typeAttributes_title_fieldName' => 'プレビュー',
 			'buttonActionName' => 'preview',
 			'typeAttributes_Name' => 'filePreview',
 			'iconName' => 'utility:preview',
