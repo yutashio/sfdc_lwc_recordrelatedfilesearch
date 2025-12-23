@@ -260,38 +260,65 @@ private class RecordRelatedFileSearchControllerTest {
 
 	@isTest
 	static void testInitExtDispSearchResFieldsColumns() {
-		// テストデータ作成
 		String objApiName = 'Account';
-		String extDispSearchResFieldsColumns = 'Name,Phone,CreatedDate';
+		String extDispSearchResFieldsColumns = 'Phone,CreatedDate';
 
-		// 実行
 		Test.startTest();
-		List<Map<String, String>> result = RecordRelatedFileSearchController.initExtDispSearchResFieldsColumns(objApiName, extDispSearchResFieldsColumns);
+		List<Map<String, String>> result =
+			RecordRelatedFileSearchController.initExtDispSearchResFieldsColumns(objApiName, extDispSearchResFieldsColumns);
 		Test.stopTest();
 
-		// 検証
 		System.assertNotEquals(null, result, '結果が null ではないこと');
-		System.assert(result.size() > 0, '結果が空ではないこと');
+		System.assert(result.size() == 8, 'デフォルト6列+追加2列であること');
 
-		// デフォルトの列が正しく追加されているか
-		System.assertEquals('ファイル名', result[0].get('label'), 'ファイル名のラベルが正しいこと');
-		System.assertEquals('fileUrl', result[0].get('fieldName'), 'ファイル名のフィールド名が正しいこと');
-		System.assertEquals('url', result[0].get('type'), 'ファイル名のタイプが正しいこと');
+		// 0) プレビュー列
+		System.assertEquals('', result[0].get('label'), 'プレビュー列: label');
+		System.assertEquals('button-icon', result[0].get('type'), 'プレビュー列: type');
+		System.assertEquals('プレビュー', result[0].get('typeAttributes_title_fieldName'), 'プレビュー列: title フィールド');
+		System.assertEquals('preview', result[0].get('buttonActionName'), 'プレビュー列: action 名');
+		System.assertEquals('filePreview', result[0].get('typeAttributes_Name'), 'プレビュー列: name');
+		System.assertEquals('utility:preview', result[0].get('iconName'), 'プレビュー列: icon');
+		System.assertEquals('bare', result[0].get('variant'), 'プレビュー列: variant');
 
-		System.assertEquals('サイズ', result[1].get('label'), 'サイズのラベルが正しいこと');
-		System.assertEquals('fileSize', result[1].get('fieldName'), 'サイズのフィールド名が正しいこと');
-		System.assertEquals('String', result[1].get('type'), 'サイズのタイプが正しいこと');
+		// 1) ファイル名列
+		System.assertEquals('ファイル名', result[1].get('label'), 'ファイル名列: label');
+		System.assertEquals('fileUrl', result[1].get('fieldName'), 'ファイル名列: fieldName');
+		System.assertEquals('url', result[1].get('type'), 'ファイル名列: type');
+		System.assertEquals('fileName', result[1].get('typeAttributes_label_fieldName'), 'ファイル名列: 表示ラベル項目');
+		System.assertEquals('_blank', result[1].get('typeAttributes_target'), 'ファイル名列: target');
 
-		// 項目が正しく追加されているか
-		Integer customFieldStartIndex = 5; // デフォルト列の後
-		System.assertEquals('Name', result[customFieldStartIndex].get('fieldName'), '"Name" のフィールド名が正しいこと');
-		System.assertEquals('String', result[customFieldStartIndex].get('type'), '"Name" のタイプが正しいこと');
+		// 2) サイズ列
+		System.assertEquals('サイズ', result[2].get('label'), 'サイズ列: label');
+		System.assertEquals('fileSize', result[2].get('fieldName'), 'サイズ列: fieldName');
+		System.assertEquals('String', result[2].get('type'), 'サイズ列: type');
 
-		System.assertEquals('Phone', result[customFieldStartIndex + 1].get('fieldName'), '"Phone" のフィールド名が正しいこと');
-		System.assertEquals('String', result[customFieldStartIndex + 1].get('type'), '"Phone" のタイプが正しいこと');
+		// 3) 拡張子列
+		System.assertEquals('拡張子', result[3].get('label'), '拡張子列: label');
+		System.assertEquals('fileExtension', result[3].get('fieldName'), '拡張子列: fieldName');
+		System.assertEquals('String', result[3].get('type'), '拡張子列: type');
 
-		System.assertEquals('CreatedDate', result[customFieldStartIndex + 2].get('fieldName'), '"CreatedDate" のフィールド名が正しいこと');
-		System.assertEquals('datetime', result[customFieldStartIndex + 2].get('type'), '"CreatedDate" のタイプが正しいこと');
+		// 4) ファイル作成/更新日列
+		System.assertEquals('ファイル作成/更新日', result[4].get('label'), '日付列: label');
+		System.assertEquals('fileCreatedDate', result[4].get('fieldName'), '日付列: fieldName');
+		System.assertEquals('datetime', result[4].get('type'), '日付列: type');
+
+		// 5) レコード名列
+		System.assertEquals('レコード名', result[5].get('label'), 'レコード名列: label');
+		System.assertEquals('recordUrl', result[5].get('fieldName'), 'レコード名列: fieldName');
+		System.assertEquals('url', result[5].get('type'), 'レコード名列: type');
+		System.assertEquals('recordName', result[5].get('typeAttributes_label_fieldName'), 'レコード名列: 表示ラベル項目');
+		System.assertEquals('_blank', result[5].get('typeAttributes_target'), 'レコード名列: target');
+
+		// 追加項目の開始位置（デフォルト6列の後）
+		Integer customStart = 6;
+
+		// 6) Phone
+		System.assertEquals('Phone', result[customStart].get('fieldName'), '追加列1: fieldName');
+		System.assertEquals('String', result[customStart].get('type'), '追加列1: type');
+
+		// 7) CreatedDate
+		System.assertEquals('CreatedDate', result[customStart + 1].get('fieldName'), '追加列2: fieldName');
+		System.assertEquals('datetime', result[customStart + 1].get('type'), '追加列2: type');
 	}
 
 	@isTest

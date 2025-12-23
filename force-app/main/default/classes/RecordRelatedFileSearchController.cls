@@ -136,6 +136,17 @@ public with sharing class RecordRelatedFileSearchController {
 
 		List<Map<String, String>> extDispSearchResFieldsColumnsList = new List<Map<String, String>>();
 
+		Map<String, String> previewColumnMap = new Map<String, String>{
+			'label' => '',
+			'type' => 'button-icon',
+			'typeAttributes_title_fieldName' => 'プレビュー',
+			'buttonActionName' => 'preview',
+			'typeAttributes_Name' => 'filePreview',
+			'iconName' => 'utility:preview',
+			'variant' => 'bare'
+		};
+		extDispSearchResFieldsColumnsList.add(previewColumnMap);
+
 		Map<String, String> fileNameColumnMap = new Map<String, String>{
 			'label' => 'ファイル名',
 			'fieldName' => 'fileUrl',
@@ -148,27 +159,21 @@ public with sharing class RecordRelatedFileSearchController {
 		Map<String, String> fileSizeColumnMap = new Map<String, String>{
 			'label' => 'サイズ',
 			'fieldName' => 'fileSize',
-			'type' => 'String',
-			'typeAttributes_label_fieldName' => '',
-			'typeAttributes_target' => ''
+			'type' => 'String'
 		};
 		extDispSearchResFieldsColumnsList.add(fileSizeColumnMap);
 
 		Map<String, String> fileExtensionColumnMap = new Map<String, String>{
 			'label' => '拡張子',
 			'fieldName' => 'fileExtension',
-			'type' => 'String',
-			'typeAttributes_label_fieldName' => '',
-			'typeAttributes_target' => ''
+			'type' => 'String'
 		};
 		extDispSearchResFieldsColumnsList.add(fileExtensionColumnMap);
 
 		Map<String, String> fileCreatedDateColumnMap = new Map<String, String>{
-			'label' => 'ファイル作成及び更新日',
+			'label' => 'ファイル作成/更新日',
 			'fieldName' => 'fileCreatedDate',
-			'type' => 'datetime',
-			'typeAttributes_label_fieldName' => '',
-			'typeAttributes_target' => ''
+			'type' => 'datetime'
 		};
 		extDispSearchResFieldsColumnsList.add(fileCreatedDateColumnMap);
 
@@ -334,6 +339,7 @@ public with sharing class RecordRelatedFileSearchController {
 				searchResultMap.putAll(contMatchedSobjMap.get(resultContVer.LinkedEntityId));
 			}
 			searchResultMap.put('fileName', resultContVer.ContentDocument.title);
+			searchResultMap.put('fileId', resultContVer.ContentDocumentId);
 			searchResultMap.put('fileSize', formatBytes(resultContVer.ContentDocument.ContentSize));
 			searchResultMap.put('fileExtension', resultContVer.ContentDocument.FileExtension);
 			searchResultMap.put('fileUrl', URL.getOrgDomainURL().toExternalForm() +'/' + resultContVer.ContentDocumentId);
